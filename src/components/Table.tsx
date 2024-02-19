@@ -1,10 +1,8 @@
-import { ApiDataType } from '../types';
+import { useContext } from 'react';
+import StarWarsContext from '../context/StarWarsContext';
 
-type TableProps = {
-  planetesInfo: ApiDataType[];
-};
-
-function Table({ planetesInfo }: TableProps) {
+function Table() {
+  const { filteredPlanets } = useContext(StarWarsContext);
   return (
     <div>
       <table>
@@ -26,7 +24,7 @@ function Table({ planetesInfo }: TableProps) {
           </tr>
         </thead>
         <tbody>
-          {planetesInfo.map((planet, index) => (
+          {filteredPlanets.map((planet, index) => (
             <tr key={ index }>
               <td>{planet.name}</td>
               <td>{planet.rotation_period}</td>

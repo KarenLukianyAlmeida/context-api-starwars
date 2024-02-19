@@ -13,3 +13,9 @@ export type ApiDataType = {
   edited: string;
   url: string;
 };
+
+export type StarWarsContextType = {
+  planets: ApiDataType[];
+  getFilterPlanets: (inputValue: string) => void;
+  filteredPlanets: ApiDataType[];
+};
