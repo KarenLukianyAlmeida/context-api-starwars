@@ -14,8 +14,21 @@ export type ApiDataType = {
   url: string;
 };
 
+export type OptionsFomrType = {
+  columnsFilter: string[];
+  comparisonFilter: string[];
+};
+
+export type FilterType = {
+  column: string;
+  comparison: string;
+  amount: string;
+};
+
 export type StarWarsContextType = {
   planets: ApiDataType[];
-  getFilterPlanets: (inputValue: string) => void;
+  getFilterPlanetsName: (inputValue: string) => void;
   filteredPlanets: ApiDataType[];
+  filterPlanets: (formValue: FilterType) => void;
+  // addFilter: (options: FilterType) => void;
 };

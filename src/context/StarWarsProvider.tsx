@@ -1,10 +1,27 @@
 import { useEffect, useState } from 'react';
-import { ApiDataType, StarWarsContextType } from '../types';
+import { ApiDataType, FilterType, OptionsFomrType, StarWarsContextType } from '../types';
 import StarWarsContext from './StarWarsContext';
+
+/* const optionsForm = {
+  columnsFilter: [
+    'population',
+    'orbital_period',
+    'diameter',
+    'rotation_period',
+    'surface_water',
+  ],
+  comparisonFilter: [
+    'maior',
+    'menor',
+    'igaul',
+  ],
+}; */
 
 function StarWarsProvider({ children }: { children: React.ReactNode }) {
   const [apiData, setApiData] = useState<ApiDataType[]>([]);
+  const [filterList, setFilterList] = useState<FilterType[]>([]);
   const [filteredPlanets, setFilteredPlanets] = useState<ApiDataType[]>(apiData);
+  // const [options, setOptions] = useState<OptionsFomrType>(optionsForm);
 
   useEffect(() => {
     const getInfoApi = async () => {
@@ -17,15 +34,38 @@ function StarWarsProvider({ children }: { children: React.ReactNode }) {
     getInfoApi();
   }, []);
 
-  const getFilterPlanets = (inputValue: string) => {
-    const result = apiData.filter((planet) => planet.name.includes(inputValue));
+  const getFilterPlanetsName = (inputValue: string) => {
+    const result = apiData
+      .filter((planet) => planet.name.toLocaleLowerCase()
+        .includes(inputValue.toLocaleLowerCase()));
     setFilteredPlanets(result);
   };
 
+  const filterPlanets = (formValue: FilterType) => {
+    console.log(formValue);
+    const { comparison, column, amount } = formValue;
+    const result = filteredPlanets.filter((planet: ApiDataType) => {
+      if (comparison === 'maior que') {
+        return Number(planet[column as keyof ApiDataType]) > Number(amount);
+      }
+      if (comparison === 'menor que') {
+        return Number(planet[column as keyof ApiDataType]) < Number(amount);
+      }
+      return Number(planet[column as keyof ApiDataType]) === Number(amount);
+    });
+    setFilteredPlanets(result);
+  };
+
+  // const addFilter = (formValue: FilterType) => {
+  //  setFilterList((prevState) => [...prevState, formValue]);
+  // };
+
   const value: StarWarsContextType = {
     planets: apiData,
-    getFilterPlanets,
+    getFilterPlanetsName,
     filteredPlanets,
+    filterPlanets,
+    // addFilter,
   };
 
   return (
