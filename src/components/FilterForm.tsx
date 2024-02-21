@@ -8,8 +8,8 @@ const initialValues = {
   amount: '0',
 };
 
-function Filter() {
-  const { getFilterPlanetsName, filterPlanets } = useContext(StarWarsContext);
+function FilterForm() {
+  const { getFilterPlanetsName, filterPlanets, options } = useContext(StarWarsContext);
   const [name, setName] = useState('');
   const [formValue, setFormValue] = useState<FilterType>(initialValues);
 
@@ -44,6 +44,7 @@ function Filter() {
           />
         </label>
       </div>
+
       <div>
         <label htmlFor="column-filter">
           <select
@@ -53,13 +54,17 @@ function Filter() {
             onChange={ handleChange }
             value={ formValue.column }
           >
-            <option value="population">population</option>
-            <option value="orbital_period">orbital_period</option>
-            <option value="diameter">diameter</option>
-            <option value="rotation_period">rotation_period</option>
-            <option value="surface_water">surface_water</option>
+            {options.columnsFilter.map((column) => (
+              <option
+                value={ column }
+                key={ column }
+              >
+                {column}
+              </option>
+            ))}
           </select>
         </label>
+
         <label htmlFor="comparison-filter">
           <select
             data-testid="comparison-filter"
@@ -68,21 +73,29 @@ function Filter() {
             onChange={ handleChange }
             value={ formValue.comparison }
           >
-            <option value="maior que">maior que</option>
-            <option value="menor que">menor que</option>
-            <option value="igual a">igual a</option>
+            {options.comparisonFilter.map((comparison) => (
+              <option
+                value={ comparison }
+                key={ comparison }
+              >
+                { comparison }
+              </option>
+            ))}
           </select>
         </label>
+
         <label htmlFor="value-filter">
           <input
             data-testid="value-filter"
             type="number"
             name="amount"
             id="value-filter"
+            min={ 0 }
             onChange={ handleChange }
             value={ formValue.amount }
           />
         </label>
+
         <button
           data-testid="button-filter"
           type="button"
@@ -95,4 +108,4 @@ function Filter() {
   );
 }
 
-export default Filter;
+export default FilterForm;

@@ -1,12 +1,14 @@
 import Table from './components/Table';
 import './App.css';
-import Filter from './components/Filter';
+import FilterForm from './components/FilterForm';
+import Filters from './components/Filters';
 
 function App() {
   return (
     <>
       <h1>Projeto Star Wars - Trybe</h1>
-      <Filter />
+      <FilterForm />
+      <Filters />
       <Table />
     </>
   );

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { ApiDataType, FilterType, OptionsFomrType, StarWarsContextType } from '../types';
 import StarWarsContext from './StarWarsContext';
 
-/* const optionsForm = {
+const optionsForm = {
   columnsFilter: [
     'population',
     'orbital_period',
@@ -11,17 +11,17 @@ import StarWarsContext from './StarWarsContext';
     'surface_water',
   ],
   comparisonFilter: [
-    'maior',
-    'menor',
-    'igaul',
+    'maior que',
+    'menor que',
+    'igual a',
   ],
-}; */
+};
 
 function StarWarsProvider({ children }: { children: React.ReactNode }) {
   const [apiData, setApiData] = useState<ApiDataType[]>([]);
   const [filterList, setFilterList] = useState<FilterType[]>([]);
   const [filteredPlanets, setFilteredPlanets] = useState<ApiDataType[]>(apiData);
-  // const [options, setOptions] = useState<OptionsFomrType>(optionsForm);
+  const [options, setOptions] = useState<OptionsFomrType>(optionsForm);
 
   useEffect(() => {
     const getInfoApi = async () => {
@@ -54,18 +54,21 @@ function StarWarsProvider({ children }: { children: React.ReactNode }) {
       return Number(planet[column as keyof ApiDataType]) === Number(amount);
     });
     setFilteredPlanets(result);
+    setFilterList((prevState) => [...prevState, formValue]);
+    setOptions((prevOptions) => (
+      { ...prevOptions,
+        columnsFilter: prevOptions.columnsFilter
+          .filter((item) => item !== formValue.column) }
+    ));
   };
-
-  // const addFilter = (formValue: FilterType) => {
-  //  setFilterList((prevState) => [...prevState, formValue]);
-  // };
 
   const value: StarWarsContextType = {
     planets: apiData,
     getFilterPlanetsName,
     filteredPlanets,
     filterPlanets,
-    // addFilter,
+    filterList,
+    options,
   };
 
   return (

@@ -30,5 +30,6 @@ export type StarWarsContextType = {
   getFilterPlanetsName: (inputValue: string) => void;
   filteredPlanets: ApiDataType[];
   filterPlanets: (formValue: FilterType) => void;
-  // addFilter: (options: FilterType) => void;
+  filterList: FilterType[];
+  options: OptionsFomrType;
 };
