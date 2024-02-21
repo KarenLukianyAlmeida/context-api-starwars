@@ -27,9 +27,6 @@ export type FilterType = {
 
 export type StarWarsContextType = {
   planets: ApiDataType[];
-  getFilterPlanetsName: (inputValue: string) => void;
   filteredPlanets: ApiDataType[];
-  filterPlanets: (formValue: FilterType) => void;
-  filterList: FilterType[];
-  options: OptionsFomrType;
+  setFilteredPlanets: React.Dispatch<React.SetStateAction<ApiDataType[]>>;
 };

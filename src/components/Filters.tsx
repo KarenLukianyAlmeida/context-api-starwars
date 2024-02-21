@@ -1,9 +1,10 @@
-import { useContext } from 'react';
-import StarWarsContext from '../context/StarWarsContext';
+import { FilterType } from '../types';
 
-function Filters() {
-  const { filterList } = useContext(StarWarsContext);
+type FilterProps = {
+  filterList: FilterType[];
+};
 
+function Filters({ filterList }: FilterProps) {
   return (
     <div className="containerFilters">
       {filterList.map((filter, index) => (
