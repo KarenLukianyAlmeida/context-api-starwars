@@ -1,7 +1,8 @@
 import React, { useContext, useEffect, useState } from 'react';
 import StarWarsContext from '../context/StarWarsContext';
-import { ApiDataType, FilterType } from '../types';
+import { ApiDataType, FilterType, OrderType } from '../types';
 import Filters from './Filters';
+import OrderPlanets from './OrderPlanets';
 
 const initialValues = {
   column: 'population',
@@ -30,6 +31,10 @@ function FilterForm() {
   const [formValue, setFormValue] = useState<FilterType>(initialValues);
   const [options, setOptions] = useState<string[]>(columnsFilter);
   const [filterList, setFilterList] = useState<FilterType[]>([]);
+  const [order, setOrder] = useState<OrderType>({
+    column: columnsFilter[0],
+    sort: 'ASC',
+  });
 
   useEffect(() => filterPlanets(), [options]);
 
@@ -67,18 +72,43 @@ function FilterForm() {
     setFilteredPlanets(result);
   };
 
+  const comparePlanets = (
+    a: ApiDataType,
+    b: ApiDataType,
+    column: keyof ApiDataType,
+    sort: string,
+  ) => {
+    const numericA = Number(a[column]);
+    const numericB = Number(b[column]);
+    if (!Number.isNaN(numericA) && !Number.isNaN(numericB)) {
+      return sort === 'ASC' ? numericA - numericB : numericB - numericA;
+    }
+
+    const stringA = String(a[column]);
+    const stringB = String(b[column]);
+
+    return stringA.localeCompare(stringB);
+  };
+
+  const orderPlanets = () => {
+    setFilteredPlanets((prevState) => {
+      const sortedPlanets = [...prevState].sort((a, b) => {
+        return comparePlanets(a, b, order.column as keyof ApiDataType, order.sort);
+      });
+      return sortedPlanets;
+    });
+  };
+
   const handleAddFilter = () => {
     setFilterList((prevState) => {
       const newFilterList = [...prevState, formValue];
       const columnsList = newFilterList.map((item) => item.column);
       const optionsList = columnsFilter
         .filter((item) => !columnsList.includes(item));
-
-      console.log(optionsList);
       setOptions(optionsList);
       setFormValue({
         ...initialValues,
-        column: optionsList.length > 0 ? optionsList[0] : '', // Ajuste conforme necessário
+        column: optionsList.length > 0 ? optionsList[0] : '',
       });
 
       return newFilterList;
@@ -111,6 +141,15 @@ function FilterForm() {
     });
   };
 
+  const handleChangeOrder = (
+    e: React.ChangeEvent<HTMLSelectElement | HTMLInputElement>,
+  ) => {
+    setOrder((prevOrder) => ({
+      ...prevOrder,
+      [e.target.name]: e.target.value,
+    }));
+  };
+
   return (
     <>
       <form>
@@ -127,7 +166,6 @@ function FilterForm() {
             />
           </label>
         </div>
-
         <div>
           <label htmlFor="column-filter">
             <select
@@ -147,7 +185,6 @@ function FilterForm() {
               ))}
             </select>
           </label>
-
           <label htmlFor="comparison-filter">
             <select
               data-testid="comparison-filter"
@@ -166,7 +203,6 @@ function FilterForm() {
               ))}
             </select>
           </label>
-
           <label htmlFor="value-filter">
             <input
               data-testid="value-filter"
@@ -178,7 +214,6 @@ function FilterForm() {
               value={ formValue.amount }
             />
           </label>
-
           <button
             data-testid="button-filter"
             type="button"
@@ -191,6 +226,12 @@ function FilterForm() {
           </button>
         </div>
       </form>
+      <OrderPlanets
+        order={ order }
+        handleChangeOrder={ handleChangeOrder }
+        columnsFilter={ columnsFilter }
+        orderPlanets={ orderPlanets }
+      />
       <Filters
         filterList={ filterList }
         handleRemoveFilter={ handleRemoveFilter }

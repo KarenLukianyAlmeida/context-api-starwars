@@ -19,6 +19,11 @@ export type OptionsFomrType = {
   comparisonFilter: string[];
 };
 
+export type OrderType = {
+  column: string;
+  sort: string;
+};
+
 export type FilterType = {
   column: string;
   comparison: string;
