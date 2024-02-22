@@ -1,6 +1,6 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import StarWarsContext from '../context/StarWarsContext';
-import { ApiDataType, FilterType, OptionsFomrType } from '../types';
+import { ApiDataType, FilterType } from '../types';
 import Filters from './Filters';
 
 const initialValues = {
@@ -9,28 +9,29 @@ const initialValues = {
   amount: '0',
 };
 
-const optionsForm = {
-  columnsFilter: [
-    'population',
-    'orbital_period',
-    'diameter',
-    'rotation_period',
-    'surface_water',
-  ],
-  comparisonFilter: [
-    'maior que',
-    'menor que',
-    'igual a',
-  ],
-};
+const comparisonFilter = [
+  'maior que',
+  'menor que',
+  'igual a',
+];
+
+const columnsFilter = [
+  'population',
+  'orbital_period',
+  'diameter',
+  'rotation_period',
+  'surface_water',
+];
 
 function FilterForm() {
-  const { planets, setFilteredPlanets, filteredPlanets } = useContext(StarWarsContext);
+  const { planets, setFilteredPlanets } = useContext(StarWarsContext);
 
   const [name, setName] = useState('');
   const [formValue, setFormValue] = useState<FilterType>(initialValues);
-  const [options, setOptions] = useState<OptionsFomrType>(optionsForm);
+  const [options, setOptions] = useState<string[]>(columnsFilter);
   const [filterList, setFilterList] = useState<FilterType[]>([]);
+
+  useEffect(() => filterPlanets(), [options]);
 
   const getFilterPlanetsName = (inputValue: string) => {
     const result = planets
@@ -47,25 +48,58 @@ function FilterForm() {
   };
 
   const filterPlanets = () => {
-    console.log(formValue);
-    const { comparison, column, amount } = formValue;
-    const result = filteredPlanets.filter((planet: ApiDataType) => {
-      if (comparison === 'maior que') {
-        return Number(planet[column as keyof ApiDataType]) > Number(amount);
-      }
-      if (comparison === 'menor que') {
-        return Number(planet[column as keyof ApiDataType]) < Number(amount);
-      }
-      return Number(planet[column as keyof ApiDataType]) === Number(amount);
+    const result = planets.filter((planet: ApiDataType) => {
+      return filterList.every((filter) => {
+        switch (filter.comparison) {
+          case 'maior que':
+            return Number(planet[filter.column as keyof ApiDataType])
+            > Number(filter.amount);
+          case 'menor que':
+            return Number(planet[filter.column as keyof ApiDataType])
+            < Number(filter.amount);
+          default:
+            return Number(planet[filter.column as keyof ApiDataType])
+            === Number(filter.amount);
+        }
+      });
     });
+
     setFilteredPlanets(result);
-    setFilterList((prevState) => [...prevState, formValue]);
-    setOptions((prevOptions) => (
-      { ...prevOptions,
-        columnsFilter: prevOptions.columnsFilter
-          .filter((item) => item !== formValue.column) }
-    ));
-    setFormValue(initialValues);
+  };
+
+  const handleAddFilter = () => {
+    setFilterList((prevState) => {
+      const newFilterList = [...prevState, formValue];
+      const columnsList = newFilterList.map((item) => item.column);
+      const optionsList = columnsFilter
+        .filter((item) => !columnsList.includes(item));
+
+      console.log(optionsList);
+      setOptions(optionsList);
+      setFormValue({
+        ...initialValues,
+        column: optionsList.length > 0 ? optionsList[0] : '', // Ajuste conforme necessário
+      });
+
+      return newFilterList;
+    });
+  };
+
+  const handleRemoveFilter = (column: string) => {
+    const result = filterList.filter((filter) => filter.column !== column);
+    setFilterList(result);
+
+    const newOptionsList = [...options, column];
+    setOptions(newOptionsList);
+  };
+
+  const handleRemoveAllFilters = () => {
+    setFilterList([]);
+    setOptions(columnsFilter);
+    setFormValue({
+      ...initialValues,
+      column: columnsFilter[0],
+    });
   };
 
   const handleChange = (
@@ -103,7 +137,7 @@ function FilterForm() {
               onChange={ handleChange }
               value={ formValue.column }
             >
-              {options.columnsFilter.map((column) => (
+              {options.map((column) => (
                 <option
                   value={ column }
                   key={ column }
@@ -122,7 +156,7 @@ function FilterForm() {
               onChange={ handleChange }
               value={ formValue.comparison }
             >
-              {options.comparisonFilter.map((comparison) => (
+              {comparisonFilter.map((comparison) => (
                 <option
                   value={ comparison }
                   key={ comparison }
@@ -148,7 +182,10 @@ function FilterForm() {
           <button
             data-testid="button-filter"
             type="button"
-            onClick={ filterPlanets }
+            onClick={ () => {
+              filterPlanets();
+              handleAddFilter();
+            } }
           >
             Filtrar
           </button>
@@ -156,6 +193,8 @@ function FilterForm() {
       </form>
       <Filters
         filterList={ filterList }
+        handleRemoveFilter={ handleRemoveFilter }
+        handleRemoveAllFilters={ handleRemoveAllFilters }
       />
     </>
   );

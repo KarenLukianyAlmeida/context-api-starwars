@@ -1,0 +1,33 @@
+export const filterPlanets = () => {
+    const result = planets.filter((planet: ApiDataType) => {
+      return filterList.every((filter) => {
+        switch (filter.comparison) {
+          case 'maior que':
+            return Number(planet[filter.column as keyof ApiDataType])
+            > Number(filter.amount);
+          case 'menor que':
+            return Number(planet[filter.column as keyof ApiDataType])
+            < Number(filter.amount);
+          default:
+            return Number(planet[filter.column as keyof ApiDataType])
+            === Number(filter.amount);
+        }
+      });
+    });
+    setFilterList((prevState) => [...prevState, formValue]);
+
+    const optionsList = columnsForm.filter((item) => item !== formValue.column);
+    setOptions(optionsList);
+    setFilteredPlanets(result);
+    setFormValue({
+      ...initialValues,
+      column: optionsList[0],
+    });
+  };
+
+  const removeFilter = (columnName: string) => {
+    const result = filterList.filter((filter) => filter.column !== columnName);
+    setFilterList(result);
+    const optionsList = filterList.filter((item) => ); 
+    setOptions(?)
+  };
