@@ -51,7 +51,7 @@ describe('FilterForm component', () => {
     expect(await screen.queryByText('Alderaan')).not.toBeInTheDocument();
   });
 
-  it('Verifica filtro por valores numéricos.', async () => {
+  it('2. Verifica filtro por valores numéricos.', async () => {
     render(<StarWarsProvider><App /></StarWarsProvider>);
 
     const inputColumn = screen.getByTestId('column-filter');
@@ -91,8 +91,34 @@ describe('FilterForm component', () => {
     expect(planetsName.length).toBe(1);
     expect(inputColumn).toHaveValue('rotation_period');
   });
+  
+  it('3. Verifica botões de excluir filtros individualmente.', async () => {
+    render(<StarWarsProvider><App /></StarWarsProvider>);
 
-  it('Verifica se o botão "Remover todas filtragens" filtros.', async () => {
+    const inputColumn = screen.getByTestId('column-filter');
+    const inputComparison = screen.getByTestId('comparison-filter');
+    const inputAmount = screen.getByTestId('value-filter');
+    const buttonFilter = screen.getByTestId('button-filter');
+    
+    await userEvent.selectOptions(inputColumn, 'population');
+    await userEvent.selectOptions(inputComparison, 'maior que');
+    await userEvent.type(inputAmount, '200000');
+    await userEvent.click(buttonFilter);
+    
+    await userEvent.selectOptions(inputColumn, 'orbital_period');
+    await userEvent.selectOptions(inputComparison, 'menor que');
+    await userEvent.type(inputAmount, '463');
+    await userEvent.click(buttonFilter);
+
+    let butonRemoveFilter = await screen.findAllByTestId('button-remove-filter');
+    expect(butonRemoveFilter.length).toBe(2);
+    await userEvent.click(butonRemoveFilter[0]);
+
+    butonRemoveFilter = await screen.findAllByTestId('button-remove-filter');
+    expect(butonRemoveFilter.length).toBe(1);
+  });
+
+  it('4. Verifica se o botão "Remover todas filtragens" filtros.', async () => {
     render(<StarWarsProvider><App /></StarWarsProvider>);
 
     const inputColumn = screen.getByTestId('column-filter');
@@ -115,7 +141,7 @@ describe('FilterForm component', () => {
     expect(screen.queryByTestId('filter')).not.toBeInTheDocument();
   });
 
-  it('Verifica filtro por ordem crescente ou decrescente', async () => {
+  it('5. Verifica filtro por ordem crescente ou decrescente', async () => {
     render(<StarWarsProvider><App /></StarWarsProvider>);
 
     const inputColumn = screen.getByTestId('column-sort');

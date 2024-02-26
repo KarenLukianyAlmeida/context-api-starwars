@@ -25,6 +25,7 @@ function Filters({
           <button
             type="button"
             className="removeBtn"
+            data-testid="button-remove-filter"
             onClick={ () => handleRemoveFilter(filter.column) }
           >
             ❌
